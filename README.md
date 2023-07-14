@@ -1,4 +1,4 @@
-# WestGreenland
+# South-West Greenland
 The data handling for the parameterisation for StrathE2EPolar model implementation of the South-West of Greenland. This is the project for my PhD.
 
 PhD aim:
