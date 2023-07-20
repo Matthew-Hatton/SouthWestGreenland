@@ -1,6 +1,6 @@
 #### Set up ####
 setwd("C:\\Users\\psb22188\\Documents\\PhD\\22-23\\West Greenland\\NEMO\\Data Wrangling\\Jacks Way")
-rm(list=ls())                                                               # Wipe the brain
+#rm(list=ls())                                                               # Wipe the brain
 
 packages <- c("MiMeMo.tools", "furrr", "ncdf4")                             # List packages
 lapply(packages, library, character.only = TRUE)                            # Load packages
@@ -13,7 +13,7 @@ all_files <- list.files("I:\\Science\\MS\\Shared\\CAO\\nemo\\ALLARC",
   as.data.frame() %>%
   mutate(Path  = substr(.,1,42),
          File = substr(.,43,60),  # Extract the file name including "grid_" and the character after the underscore
-         Year = substr(., 52, 53),  # Extract the year as a two-digit value from the file name
+         Year = substr(., 50, 53),  # Extract the year as a two-digit value from the file name
          date = substr(., 56, 57),  # Extract the date as a two-digit value from the file name
          Month = substr(., 54, 55),
          Type = substr(.,43,49)) %>%  # Extract the month as a two-digit value from the file name
@@ -39,13 +39,13 @@ crop <- readRDS("Objects\\Domains.rds") %>% #loads domain rds, takes every point
 
 Bathymetry <- readRDS("Objects\\NA_grid.rds") %>%                          # Import NEMO-MEDUSA bathymetry
   st_drop_geometry() %>%                                                    # Drop sf geometry column 
-  select(-c("x", "y"), latitude = Latitude, longitude = Longitude)          # Clean column so the bathymetry is joined by lat/lon
+  dplyr::select(-c("x", "y"), latitude = Latitude, longitude = Longitude)          # Clean column so the bathymetry is joined by lat/lon
 
 #### Build summary scheme ####
 
 scheme <- scheme_strathE2E(get_spatial(paste0(all_files$Path[1], all_files$File[1]), grid_W = F),
                            Bathymetry, 40, 600, crop) %>% 
-  select(x, y, layer, group, weight, slab_layer, longitude, latitude, Bathymetry) %>%   # Get a scheme to summarise for StrathE2E
+  dplyr::select(x, y, layer, group, weight, slab_layer, longitude, latitude, Bathymetry) %>%   # Get a scheme to summarise for StrathE2E
   st_as_sf(coords = c("longitude", "latitude"), crs = 4326, remove = F) %>% # Convert to sf object
   st_join(st_transform(domains, crs = 4326)) %>%                            # Attach model zone information
   st_drop_geometry()                                                        # Drop sf formatting
@@ -71,7 +71,7 @@ scheme_result <- arrange(scheme, group) %>%                                 # Cr
 tictoc::tic()
 all_files %>% 
   split(., f = list(.$Month, .$Year)) %>%                                   # Specify the timestep to average files over.
-   # .[1:12] %>% 
+   #.[1:12] %>% 
   future_map(NEMO_MEDUSA, analysis = "slabR", summary = scheme_result,
              scheme = scheme, ice_scheme = ice_scheme$n, start = start,  
              count = count, out_dir = "Objects\\Months", .progress = T)    # Perform the extraction and save an object for each month (in parallel)

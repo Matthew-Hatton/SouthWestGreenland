@@ -11,7 +11,7 @@ plan(multisession)
 tic()
 
 SP <- list.files("Objects/Months",full.names = T) %>% 
-  future_map(decadal,.progress = TRUE) %>% #read in data and create decade column
+  future_map(decadal, .progress = TRUE) %>% #read in data and create decade column
   data.table::rbindlist() %>% #combine df's
   mutate(Decade = as.factor(Decade), #change decade to factor
          Speed = vectors_2_direction(Zonal,Meridional)[,"uvSpeed"]) %>%  #converts currents to speed
@@ -21,3 +21,4 @@ SP <- list.files("Objects/Months",full.names = T) %>%
   saveRDS("Objects/SPATIAL.rds")
 
 toc()
+
