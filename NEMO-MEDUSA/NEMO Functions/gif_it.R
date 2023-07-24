@@ -11,6 +11,7 @@ gif_it <- function(file,variable,tocall){
   for (m in unique(file$Month)) {
     # Subset the data for the current month
     data_month <- subset(file, Month == m)
+    print("Done this")
     # Create the ggplot for the current month
     
     limits <- switch(variable,
@@ -21,6 +22,17 @@ gif_it <- function(file,variable,tocall){
                      "Detritus" = c(0,0.5),
                      "Phytoplankton" = c(0,0.7),
                      default = c(0, 100))
+    titlecol <- if (m %in% c(1, 2, 12)) { #color plot titles based on seasons
+      "Blue"
+    } else if (m %in% c(3, 4, 5)) {
+      "lightgreen"
+    } else if (m %in% c(6, 7, 8)) {
+      "Red"
+    } else if (m %in% c(9, 10, 11)) {
+      "darkorange"
+    } else {
+      "Unknown"
+    }
     
     p <- ggplot() +
       geom_raster(data = data_month,aes(x = x,y = y,fill = .data[[variable]])) +
@@ -31,7 +43,8 @@ gif_it <- function(file,variable,tocall){
             axis.title.x = element_blank(),
             axis.ticks.x = element_blank(),axis.ticks.y = element_blank(),
             axis.text.x=element_blank(),axis.text.y=element_blank(),
-            panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+            panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+            plot.title = element_text(color = titlecol)) +
       scale_fill_viridis_c(option = "mako",limits = limits)
     ggsave(filename = paste(m,".png", sep = ""),
            plot = p, width = 8, height = 6,background = "black",path = var_dir)
