@@ -5,10 +5,10 @@
 
 library(MiMeMo.tools)
 library(furrr)                                                              # List packages
-#plan(multisession)
+plan(multisession)
 
 domain <- readRDS("Objects\\Domains.rds") %>%                              # Get the horizontal area to extract over 
-  select(Shore) %>% 
+  dplyr::select(Shore) %>% 
   filter(Shore =="Offshore")
 
 target_depth <- 40                                                          # Set the depth to interpolate to
@@ -20,7 +20,7 @@ example <- list.files("I:\\Science\\MS\\Shared\\CAO\\nemo\\ALLARC", # File to pu
 
 Bathymetry <- readRDS("Objects\\NA_grid.rds") %>% #Import NM bathymetry data
   st_drop_geometry() %>%  #drop sf geometry column
-  select(-c("x","y"),latitude = Latitude,longitude = Longitude) #clean column s.t bathymetry joined by lat/lon
+  dplyr::select(-c("x","y"),latitude = Latitude,longitude = Longitude) #clean column s.t bathymetry joined by lat/lon
 
 scheme <- scheme_interp_slice(get_spatial(example, grid_W = T), target_depth, domain) #get a scheme for linear interpolation between 2 depth layers
 
@@ -37,7 +37,7 @@ scheme <- scheme_reframe(scheme) %>%                                        # Ad
 summary <- filter(scheme, layer == 1) %>% #create metadata to attach to summaries
   arrange(group) %>% #summaries returned in group order, make sure these match
   mutate(depth = target_depth) %>% #return the depth we interpolated to
-  select(x,y,longitude,latitude,depth)#as well as horizontal info
+  dplyr::select(x,y,longitude,latitude,depth)#as well as horizontal info
 
 #### Extract ####
 
@@ -51,11 +51,8 @@ W_files <- list.files("I:\\Science\\MS\\Shared\\CAO\\nemo\\ALLARC",
          Month = substr(., 54, 55),
          Type = substr(.,43,49)) %>%  # Extract the month as a two-digit value from the file name
   filter(!File %in% c("ptrc_T_20000625.nc", "ptrc_T_20470130.nc")) %>%      # Drop corrupted files
-  filter(Type != "grid_W_") %>%
-  filter(Type != "_meter.") %>% 
-  filter(Type != "drg.nc") %>%
-  filter(Type != "inates.") %>% # Drop the vertical water movement files
-  dplyr::select(Path,File,date,Year,Month,Type) %>% 
+  filter(Type == "grid_W_") %>%
+  dplyr::select(Path,File,date,Year,Month,Type) %>%
   split(.,f = list(.$Month,.$Year)) #get df file names for each time step to summarise to
 
 ice_scheme <- filter(scheme, layer == 1) %>%                                # Ice data is stored as a matrix, so needs a new scheme
@@ -63,7 +60,7 @@ ice_scheme <- filter(scheme, layer == 1) %>%                                # Ic
   transmute(n = xyindex_to_nindex(x, y, count[1]))
 
 tic()
-future_map(W_files, NEMO_MEDUSA, analysis = "slabR",                        # Interpolate grid_W files in paralell
-           out_dir = "./Objects/vertical boundary", scheme_w = scheme,
+future_map(W_files, NEMO_MEDUSA, analysis = "slabR",                        # Interpolate grid_W files in parallel
+           out_dir = "Objects/vertical boundary", scheme_w = scheme,
            start_w = start, count_w = count, summary = summary, .progress = T)
 toc()
