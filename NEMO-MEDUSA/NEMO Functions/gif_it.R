@@ -2,7 +2,7 @@
 
 # Loop through each month and create and save individual plots
 gif_it <- function(file,variable,tocall){
-  output_dir <- paste("Clean Grid Figures/Animation/", tocall, sep = "") #must first create file
+  output_dir <- paste("Figures and Data/Clean Grid Figures/Animation/", tocall, sep = "") #must first create file
   if (!dir.exists(output_dir)){
     dir.create(output_dir)
   }
@@ -11,16 +11,18 @@ gif_it <- function(file,variable,tocall){
   for (m in unique(file$Month)) {
     # Subset the data for the current month
     data_month <- subset(file, Month == m)
-    print("Done this")
     # Create the ggplot for the current month
     
     limits <- switch(variable,
                      "Temperature" = c(-2, 15),
                      "Salinity" = c(22, 35),
                      "Ice_pres" = c(0, 1),
+                     "Ice_Thickness" = c(0, 1.6),
+                     "Ice_conc" = c(0,1),
+                     "Snow_Thickness" = c(0,0.4),
                      "DIN" = c(0,20),
                      "Detritus" = c(0,0.5),
-                     "Phytoplankton" = c(0,0.7),
+                     "Phytoplankton" = c(0,2.5),
                      default = c(0, 100))
     titlecol <- if (m %in% c(1, 2, 12)) { #color plot titles based on seasons
       "Blue"
@@ -44,10 +46,11 @@ gif_it <- function(file,variable,tocall){
             axis.ticks.x = element_blank(),axis.ticks.y = element_blank(),
             axis.text.x=element_blank(),axis.text.y=element_blank(),
             panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-            plot.title = element_text(color = titlecol)) +
+            plot.title = element_text(color = titlecol),
+            aspect.ratio = 1/cos(mean(data_month$latitude)*(pi/180))) +
       scale_fill_viridis_c(option = "mako",limits = limits)
     ggsave(filename = paste(m,".png", sep = ""),
-           plot = p, width = 8, height = 6,background = "black",path = var_dir)
+           plot = p, width = 8, height = 6,background = "white",path = var_dir)
     
   }
   imgs <- list.files(var_dir,pattern = "\\.png")
