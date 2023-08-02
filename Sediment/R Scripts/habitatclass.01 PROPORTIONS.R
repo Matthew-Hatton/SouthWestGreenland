@@ -35,3 +35,4 @@ sediment_areas <- result %>%
 print(sum(sediment_areas$proportion)) #check to see if they add to 1
 
 saveRDS(sediment_areas,"Objects\\Sediment Proportions.RDS")
+
