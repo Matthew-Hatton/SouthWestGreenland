@@ -54,13 +54,15 @@ inshore_aggregate <- data.frame(Sediment = c("Rock", "Mud", "Sand", "Gravel"),
                       Proportion = c(sum(inshore_proportion[1:2]),
                                      sum(inshore_proportion[c(6)]),
                                      sum(inshore_proportion[c(5, 7)]),
-                                     sum(inshore_proportion[c(3,4)])))
+                                     sum(inshore_proportion[c(3,4)])),
+                      Weighted_Mean_Grain_Size = averages$WeightedMedGrainSize)
 
 offshore_aggregate <- data.frame(Sediment = c("Rock", "Mud", "Sand", "Gravel"),
                       Proportion = c(sum(offshore_proportion[1:2]),
                                      sum(offshore_proportion[6]),
                                      sum(offshore_proportion[c(5,7)]),
-                                     sum(inshore_proportion[c(3,4)])))
+                                     sum(inshore_proportion[c(3,4)])),
+                      Weighted_Mean_Grain_Size = averages$WeightedMedGrainSize)
 
 sum(inshore_proportion,offshore_proportion) #check (should equal 1)
 
