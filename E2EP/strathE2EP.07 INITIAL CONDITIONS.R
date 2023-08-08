@@ -1,6 +1,6 @@
-library(StrathE2EPolar)
 
-model <- e2ep_read("SW_Greenland", "2011-2019", models.path="Models") #read in
+library(StrathE2EPolar)
+model <- e2ep_read("SW_Greenland","2011-2019")
 results <- e2ep_run(model,nyears = 50)                                # Run the model to find s.s
 
 e2ep_plot_ts(model, results) #plot ts check for s.s

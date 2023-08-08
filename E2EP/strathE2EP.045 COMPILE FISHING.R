@@ -33,6 +33,8 @@ fishing_discards$Discardrate_DF[1:9] = 0 #no discarding greenland halibut
 fishing_discards$Discardrate_PF[9] = 0
 fishing_discards$Discardrate_PF[7] <- 0.1
 
+write.csv(fishing_discards,"Models\\SW_Greenland\\2011-2019\\Param\\fishing_discards_SWG_2011-2019.csv")
+
 
 
 
