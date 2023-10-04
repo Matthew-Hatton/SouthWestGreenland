@@ -1,3 +1,5 @@
+#static gear multipliers OLD
+
 rm(list = ls()) #fresh start
 library(tidyverse)
 library(StrathE2EPolar)
