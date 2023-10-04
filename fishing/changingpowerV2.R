@@ -1,3 +1,5 @@
+#This is code to statically step through just one gear (OLD)
+
 rm(list = ls()) #fresh start
 library(tidyverse)
 library(doParallel)
