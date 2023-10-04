@@ -24,20 +24,18 @@ gears <- c("Pelagic_trawl+seine",
 )
 
 master <- data.frame()
-for (i in 1:length(gears)){ #shouldn't be using a for loop here
+for (i in 1:length(gears)){
   randdf <- matrix(nrow = length(scaling),ncol = length(gears),data = runif(n = length(scaling)*length(gears),min=scaling[1],
                                                                             max = tail(scaling,n=1))) %>%
     data.frame() #creates dataframe with correct dimensions
   randdf[,i] <- scaling
   randdf$focal <- gears[i]
   master <- rbind(master,randdf)
-}
+} #build the random dataframe
 colnames(master) <- append(gears,"focal")
 #give ID number
-master <- tibble::rowid_to_column(master,"SimulationID")
+master <- tibble::rowid_to_column(master,"SimulationID") #adds simID
 rm(randdf)
-
-#row_list <- split(master, seq(nrow(master))) #split each df row into list
 
 focalgear <- function(SimulationID,`Pelagic_trawl+seine`,`Demersal_otter_trawl`,`Demersal_seine`,
                       `Gill_nets`,`Longlinesandjiggiing`,`Recreational`,`Shrimp_trawl`,
@@ -62,7 +60,6 @@ focalgear <- function(SimulationID,`Pelagic_trawl+seine`,`Demersal_otter_trawl`,
   saveRDS(results$final.year.outputs$offshore_discmat,str_glue("./fishing/fishing bounds/changingpower/output3/discards/{SimulationID}_offshore_{focal}.rds"))
 }
 
-#apply scaling vector n - parallel
-runs <- future_pmap(master,safely(focalgear),.progress = TRUE)
+runs <- future_pmap(master,safely(focalgear),.progress = TRUE) #call the function in parallel
 toc() #time
 
