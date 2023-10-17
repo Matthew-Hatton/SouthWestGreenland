@@ -2,7 +2,7 @@ rm(list=ls()) #reset
 library(StrathE2EPolar)
 model <- e2ep_read("SW_Greenland","2090-2099",
                    models.path = "Models")
-results <- e2ep_run(model,nyears = 100)                                # Run the model to find s.s
+results <- e2ep_run(model,nyears = 200)                                # Run the model to find s.s
 
 e2ep_plot_ts(model, results) #plot ts check for s.s
 
